@@ -68,7 +68,6 @@ dlta_process_int16 (int16_t *samples, int nsamples, int nch, int bps, int srate)
     }
 
     double prevSample[nch];
-    double result[nch];
 
     int i;
     for (i = 0; i < nch; i++) 
@@ -77,20 +76,19 @@ dlta_process_int16 (int16_t *samples, int nsamples, int nch, int bps, int srate)
     for (i = nch; i < nsamples*nch; i+=nch) {
 
         int j;
-        double delta;
+        double result;
         for (j = 0; j < nch; j++) {
-            delta = samples[i+j]-prevSample[j];
-            result[j] = samples[i+j]+(gain/100.0)*delta;
+            result = samples[i+j]+((gain/100.0)*(samples[i+j]-prevSample[j]));
 
-            if (result[j] > 32767.0) {
-                result[j] = 32767.0;
+            if (result > 32767.0) {
+                result = 32767.0;
             }
-            else if (result[j] < -32768.0) {
-                result[j] = -32768.0;
+            else if (result < -32768.0) {
+                result = -32768.0;
             }
 
             prevSample[j] = samples[i+j];
-            samples[i+j] = result[j];
+            samples[i+j] = result;
         }
     }
 
